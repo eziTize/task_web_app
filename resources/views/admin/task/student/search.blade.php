@@ -25,25 +25,49 @@
                    <form action="{{ Asset($link.'search') }}" method="GET" id="search_form" class="col s12">
 
 
+                    <div class="input-field col s12 l4">
 
-                        <div class="input-field col s12 l5">
+                     <i class="fa fa-user prefix"></i>
+
+                        <select style="padding-left: 40px" class="browser-default" name="user_id">
+
+                            <option value="">Select Student </option>
+
+
+                                @foreach($student as $students)
+
+                                        <option value="{{ $students->id }}">
+
+                                        {{ $students->name }}, ID: {{ $students->id }}
+
+                                        </option>
+
+                                @endforeach
+
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="input-field col s12 l3">
 
                                 <i class="fa fa-calendar prefix"></i>
 
                                 {!! Form::date('from', null,['id' => 'from','required' => 'required', 'class' => 'datepicker' ]) !!}
 
-                                <label for="from">Deadline From </label>
+                                <label for="from">From </label>
 
                         </div>
 
 
-                        <div class="input-field col s12 l5">
+                        <div class="input-field col s12 l3">
 
                                 <i class="fa fa-calendar prefix"></i>
 
                                 {!! Form::date('to', null,['id' => 'to','required' => 'required', 'class' => 'datepicker' ]) !!}
 
-                                <label for="to">Deadline To </label>
+                                <label for="to">To </label>
 
 
                         </div>

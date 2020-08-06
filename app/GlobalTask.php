@@ -9,6 +9,8 @@ class GlobalTask extends Model
 {
 	protected $table = "global_tasks";
 
+    protected $fillable = ['admin_id', 'task_name', 'task_desc', 'start_date', 'end_date', 'priority'];
+
 	/*
 	|----------------------------------------------------------------
 	|	Validation rules

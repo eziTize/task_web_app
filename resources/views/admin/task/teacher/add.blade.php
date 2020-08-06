@@ -1,5 +1,5 @@
 @extends('admin.layout.main')
-@section('title') Add New Team Member Task @endsection
+@section('title') Assign New Team Member Task @endsection
 
 @section('content')
 <div class="container">

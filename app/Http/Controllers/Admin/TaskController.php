@@ -47,16 +47,80 @@ class TaskController extends Controller
 
 
         $admin_id = Auth::guard('admin')->user()->id;
+
+
+    if($request->get('user_id') == null && $request->get('from') == null && $request->get('to') == null ){
+
+                return back()->with('error','Please Enter A Search Parameter');
+        }
+
+    else{
+
+         if($request->get('user_id') && $request->get('to') && $request->get('from')){
+
+            $data = Task::where('asg_student_id', $request->get('user_id'))->whereBetween('start_date', [$request->get('from'), $request->get('to')])->get();
+        
+        }
+
+        elseif($request->get('to') && $request->get('from')){
+
+            $data = Task::where('asg_teacher_id', null)->whereBetween('start_date', [$request->get('from'), $request->get('to')])->get();
+
+        }
+
+
+        elseif($request->get('user_id')){
+
+
+            if($request->get('user_id') && $request->get('to') && $request->get('from') == null ){
+
+                $data = Task::where('asg_student_id', $request->get('user_id'))->where('start_date', $request->get('to'))->get();
+
+            }
+
+
+            elseif($request->get('user_id') && $request->get('from') && $request->get('to') == null ){
+
+                $data = Task::where('asg_student_id', $request->get('user_id'))->where('start_date', $request->get('from'))->get();
+
+
+            }
+
+            else{
+
+                $data = Task::where('asg_student_id', $request->get('user_id'))->get();
+
+            }
+
+        }
+
+
+        elseif($request->get('to') && $request->get('from') == null )
+
+        {
+            $data = Task::where('asg_teacher_id', null)->where('start_date', $request->get('to'))->get();
+        }
+
+
+        elseif($request->get('from') && $request->get('to') == null )
+
+        {
+            $data = Task::where('asg_teacher_id', null)->where('start_date', $request->get('from'))->get();
+        }
+
+
         
         $data = [
-            'data' => Task::where('admin_id', $admin_id)->where('asg_teacher_id', null)->where('is_deleted','0')->whereBetween('end_date', [$request->get('from'), $request->get('to')])->get(),
+            'data' => $data,
             //'task_comment' => new TaskComment,
             'student' => Student::get(),
             'link' => env('admin').'/student-task/'
         ];
 
         return View('admin.task.student.search',$data);
+
     }
+}
 
 
     /*
@@ -94,9 +158,68 @@ class TaskController extends Controller
 
         $admin_id = Auth::guard('admin')->user()->id;
 
+        if($request->get('user_id') == null && $request->get('from') == null && $request->get('to') == null ){
+
+                return back()->with('error','Please Enter A Search Parameter');
+        }
+
+    else{
+
+         if($request->get('user_id') && $request->get('to') && $request->get('from')){
+
+            $data = Task::where('asg_teacher_id', $request->get('user_id'))->whereBetween('start_date', [$request->get('from'), $request->get('to')])->get();
+        
+        }
+
+        elseif($request->get('to') && $request->get('from')){
+
+            $data = Task::where('asg_teacher_id', null)->whereBetween('start_date', [$request->get('from'), $request->get('to')])->get();
+
+        }
+
+
+        elseif($request->get('user_id')){
+
+
+            if($request->get('user_id') && $request->get('to') && $request->get('from') == null ){
+
+                $data = Task::where('asg_teacher_id', $request->get('user_id'))->where('start_date', $request->get('to'))->get();
+
+            }
+
+
+            elseif($request->get('user_id') && $request->get('from') && $request->get('to') == null ){
+
+                $data = Task::where('asg_teacher_id', $request->get('user_id'))->where('start_date', $request->get('from'))->get();
+
+
+            }
+
+            else{
+
+                $data = Task::where('asg_teacher_id', $request->get('user_id'))->get();
+
+            }
+
+        }
+
+
+        elseif($request->get('to') && $request->get('from') == null )
+
+        {
+            $data = Task::where('asg_student_id', null)->where('start_date', $request->get('to'))->get();
+        }
+
+
+        elseif($request->get('from') && $request->get('to') == null )
+
+        {
+            $data = Task::where('asg_student_id', null)->where('start_date', $request->get('from'))->get();
+        }
+
         
         $data = [
-            'data' => Task::where('admin_id', $admin_id)->where('asg_student_id', null)->where('is_deleted','0')->whereBetween('end_date', [$request->get('from'), $request->get('to')])->get(),
+            'data' => $data,
             //'task_comment' => new TaskComment,
             'teacher' => Teacher::get(),
             'link' => env('admin').'/team-members-task/'
@@ -104,6 +227,7 @@ class TaskController extends Controller
 
         return View('admin.task.teacher.search',$data);
     }
+  }
 
 
 
@@ -165,7 +289,6 @@ class TaskController extends Controller
         $data->admin_id = $admin_id;
 
         $data->priority = $request->input('priority');
-
 
         $data->asg_student_id = $request->input('asg_student_id');
 
@@ -391,24 +514,9 @@ class TaskController extends Controller
 
         $data->priority = $request->input('priority');
 
-
         $data->task_desc = $request->input('task_desc');
       
-
         $data->save();
-
-
-        //$data->complete_rq = $request->input('complete_rq');
-
-
-        //$notification = new Notification;
-
-        //$notification->teacher_id = $request->input('asg_teacher_id');
-
-        //$notification->message = 'Your Task has been updated recently';
-
-        //$notification->save();
-
 
 
        return Redirect(env('admin').'/team-members-task')->with('message','Task Updated Successfully.');
@@ -605,20 +713,126 @@ class TaskController extends Controller
 
     
     $admin_id = Auth::guard('admin')->user()->id;
-    $u_task = UserTask::where('type','Task')->whereBetween('deadline', [$request->get('from'), $request->get('to')])->get();
+
+
+    // If Both Student & Team Member
+    
+    if($request->get('teacher_id') && $request->get('student_id')){
+
+      return back()->with('error','Cannot Search For Both Student & Team Member at the Same Time');
+
+    }
+
+
+    // If All Null
+    elseif($request->get('teacher_id') == null && $request->get('student_id') == null && $request->get('from') == null && $request->get('to') == null){
+
+        return back()->with('error','Please Enter A Search Parameter');
+
+    }
+
+
+
+    else{
+
+    //Member Search
+    if($request->get('teacher_id')){
+
+        if($request->get('teacher_id') && $request->get('to') && $request->get('from')){
+
+        $u_tasks = UserTask::where('teacher_id', $request->get('teacher_id'))->whereBetween('deadline', [$request->get('from'), $request->get('to')])->get();
+        
+        }
+
+
+        elseif($request->get('teacher_id') && $request->get('to') && $request->get('from') == null){
+
+            $u_tasks = UserTask::where('teacher_id', $request->get('teacher_id'))->where('deadline', $request->get('to'))->get();
+        }
+
+        elseif($request->get('teacher_id') && $request->get('from') && $request->get('to') == null){
+
+            $u_tasks = UserTask::where('teacher_id', $request->get('teacher_id'))->where('deadline', $request->get('from'))->get();
+        }
+
+         else{
+
+            $u_tasks = UserTask::where('teacher_id', $request->get('teacher_id'))->get();
+        }
+
+    }
+    
+    //Student Search
+    elseif($request->get('student_id')){
+
+        if($request->get('student_id') && $request->get('to') && $request->get('from')){
+
+        $u_tasks = UserTask::where('student_id', $request->get('student_id'))->whereBetween('deadline', [$request->get('from'), $request->get('to')])->get();
+        
+        }
+
+        elseif($request->get('student_id') && $request->get('to') && $request->get('from') == null){
+
+            $u_tasks = UserTask::where('student_id', $request->get('student_id'))->where('deadline', $request->get('to'))->get();
+        }
+
+        elseif($request->get('student_id') && $request->get('from') && $request->get('to') == null){
+
+            $u_tasks = UserTask::where('student_id', $request->get('student_id'))->where('deadline', $request->get('from'))->get();
+        }
+
+
+        else{
+
+            $u_tasks = UserTask::where('student_id', $request->get('student_id'))->get();
+        }
+
+    }
+
+
+    // Only To & From
+    elseif($request->get('to') && $request->get('from')){
+
+            $u_tasks = UserTask::whereBetween('deadline', [$request->get('from'), $request->get('to')])->get();
+
+        }
+
+    // Only From
+    elseif($request->get('from') && $request->get('to') == null){
+
+
+            $u_tasks = UserTask::where('deadline', $request->get('from'))->get();
+
+    }
+
+    //Only To
+    elseif($request->get('to') && $request->get('from') == null){
+
+
+            $u_tasks = UserTask::where('deadline', $request->get('to'))->get();
+
+
+    }
+    
+
 
         $data = [
-           'data' => $u_task,
+            'student' => Student::where('is_deleted','0')->get(),
+            'teacher' => Teacher::where('is_deleted','0')->get(),
+            'data' => $u_tasks,
             'task' => Task::get(),
             'gtask' => GlobalTask::get(),
-            'student' => Student::get(),
-            'teacher' => Teacher::get(),
+            'from' => $request->get('from'),
+            'to' => $request->get('to'),
+            'teacher_id' => $request->get('teacher_id'),
+            'student_id' => $request->get('student_id'),
             'link' => env('admin').'/approve-requests/'
         ];
 
         return View('admin.task.search',$data);
-
     }
+
+}
 
 
     /*
@@ -781,9 +995,14 @@ class TaskController extends Controller
     */
     public function AssignRequests(){
 
+
         
         $data = [
-            'data' => Task::where('approved', 'N')->get(),
+            'data' =>  Task::where(function($query){
+                $query->where('is_deleted','0')->where('approved', 'N');
+            })->orWhere(function($query){
+                $query->where('is_deleted','0')->where('approved', 'P');
+            })->get(),  
             'teacher' => Teacher::get(),
             'student'=> Student::get(),
             'link' => env('admin').'/assign-requests/'
@@ -791,7 +1010,6 @@ class TaskController extends Controller
 
         return View('admin.task.ag_index',$data);
     }
-
 
 
     /*
@@ -805,7 +1023,6 @@ class TaskController extends Controller
         $data = Task::findOrFail($id);
         $data->approved = 'Y';
         $data->save();
-
 
         $u_task = new UserTask;
 
@@ -832,9 +1049,10 @@ class TaskController extends Controller
 
         
         $data = Task::findOrFail($id);
-        $data->delete();
+        $data->approved = 'N';
+        $data->save();
 
-        return back()->with('message','Request Removed Successfully.');
+        return back()->with('message','Request Rejected Successfully.');
 
     }
 

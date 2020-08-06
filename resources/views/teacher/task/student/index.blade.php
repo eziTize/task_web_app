@@ -14,8 +14,7 @@
 
         <a href="{{ Asset($link.'search') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px;">Search</a>
 
-       <a href="{{ Asset($link.'add') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px;margin-right:5px;">Add New</a>
-
+        <a href="{{ Asset($link.'add') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px; margin-right:5px;">Assign New</a>
 
         @endsection
 

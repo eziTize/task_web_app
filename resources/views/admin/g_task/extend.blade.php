@@ -10,6 +10,10 @@
 
     <div class="section">
 
+        @section('button')
+        <a href="{{ Asset($link) }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px">Back</a>
+        @endsection
+
         <div class="row">
 
 
@@ -18,34 +22,6 @@
             {!! Form::model($data, ['method' => 'POST','url' => [env('admin').'/g-task/'.$data->id.'/extend-submit'],'files' => true,'autocomplete' => 'off'],['class' => 'col s12']) !!}
 
 
-
-                <div class="col s12 m12 l12">
-
-                    <div class="card-panel">
-
-
-                        <div class="row">
-
-                                 <div class="input-field col s12 112">
-
-
-                                <i class="mdi-social-person prefix"></i>
-
-
-                                <select style="padding-left: 40px" class="browser-default" name="task_for" required disabled="disabled">
-
-
-                                    <option value="{{$data->task_for}}"> {{$data->task_for}} </option>
-
-
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <br>
 
                         <div class="row">
 

@@ -1,5 +1,5 @@
 @extends('teacher.layout.main')
-@section('title') Add New Student Task @endsection
+@section('title') Assign New Student Task @endsection
 
 @section('content')
 <div class="container">

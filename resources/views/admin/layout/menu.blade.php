@@ -117,6 +117,11 @@
          </li>
 
 
+
+         <li class="<?php if($page == "g-task"){ echo "active"; } ?>"><a href="{{ Asset(env('admin').'/g-task') }}"><i class="fa fa-file-text-o"></i> Assign G-Tasks </a></li>
+
+
+
            <li>
 
             <ul class="collapsible collapsible-accordion">
@@ -168,7 +173,6 @@
                             <li class="<?php if($page == "assign-requests"){ echo "active"; } ?>"><a href="{{ Asset(env('admin').'/assign-requests') }}"><i class="fa fa-file-text" style="font-size:16px"></i> Assign Requests </a></li>
 
 
-
                         </ul>
 
                     </div>
@@ -183,35 +187,10 @@
 
          <li>
 
-            <ul class="collapsible collapsible-accordion">
-
-                <li>
-
-                    <a class="collapsible-header waves-effect waves-cyan <?php if($page == 'g-task' || $page == 'g-task-requests' || $page == 'g-extend-requests' ){ ?> active <?php } ?>"><i class="fa fa-clone"></i> Global Tasks </a>
-
-                    <div class="collapsible-body">
-
-                        <ul>
-
-                             <li class="<?php if($page == "g-task"){ echo "active"; } ?>"><a href="{{ Asset(env('admin').'/g-task') }}"><i class="fa fa-file-text-o" style="font-size:16px"></i> Manage G-Tasks </a></li>
+        
 
 
-                            <li class="<?php if($page == "g-task-requests"){ echo "active"; } ?>"><a href="{{ Asset(env('admin').'/g-task-requests') }}"><i class="fa fa-check" style="font-size:16px"></i> Approve Requests </a></li>
-
-
-                             <li class="<?php if($page == "g-extend-requests"){ echo "active"; } ?>"><a href="{{ Asset(env('admin').'/g-extend-requests') }}"><i class="fa fa-lightbulb-o" style="font-size:16px"></i> Extend Requests </a></li>
-
-
-
-                        </ul>
-
-                    </div>
-
-                </li>
-
-            </ul>
-
-        </li>
+                    
 
 
 

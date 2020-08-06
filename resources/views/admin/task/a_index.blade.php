@@ -15,11 +15,61 @@
 
         <div class="col s12 m12 l12">
 
+        <form action="{{ Asset($link.'search') }}" method="GET" id="search_form" class="col s12">
 
-         {!! Form::model($data, ['method' => 'GET','url' => [env('admin').'/approve-requests/search'],'files' => true,'autocomplete' => 'off'],['class' => 'col s12']) !!}
 
 
-                        <div class="input-field col s12 l5">
+            <div class="input-field col s12 l3">
+
+                <i class="fa fa-user prefix"></i>
+
+                <select style="padding-left: 40px" class="browser-default" name="teacher_id">
+
+                        <option value="">Select Team Member </option>
+
+
+                        @foreach($teacher as $teachers)
+
+                                <option value="{{ $teachers->id }}">
+
+                                {{ $teachers->name }}, ID: {{ $teachers->id }}
+
+                                </option>
+
+                        @endforeach
+
+
+                </select>
+
+                </div>
+
+
+                <div class="input-field col s12 l3">
+
+                     <i class="fa fa-user prefix"></i>
+
+                        <select style="padding-left: 40px" class="browser-default" name="student_id">
+
+                            <option value="">Select Student </option>
+
+
+                                @foreach($student as $students)
+
+                                        <option value="{{ $students->id }}">
+
+                                        {{ $students->name }}, ID: {{ $students->id }}
+
+                                        </option>
+
+                                @endforeach
+
+
+                         </select>
+
+                </div>
+
+
+                        <div class="input-field col s12 l2">
 
                                 <i class="fa fa-calendar prefix"></i>
 
@@ -30,7 +80,7 @@
                         </div>
 
 
-                        <div class="input-field col s12 l5">
+                        <div class="input-field col s12 l2">
 
                                 <i class="fa fa-calendar prefix"></i>
 
@@ -48,7 +98,7 @@
                             <button class="btn green waves-effect waves-light" type="submit" name="action">Search <i class="fa fa-search left"></i></button>
 
                         </div>
-
+        </form>
 
         </div>
         </div>
@@ -82,7 +132,7 @@
 
                                 <th style="text-align: center;"> Status </th>
 
-                                <th style="text-align: center;"> Grade </th>
+                                <th style="text-align: center;"> Options </th>
 
                             </tr>
 

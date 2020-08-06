@@ -24,9 +24,9 @@
 
                      <i class="fa fa-user prefix"></i>
 
-                        <select style="padding-left: 40px" class="browser-default" name="user_id" required>
+                        <select style="padding-left: 40px" class="browser-default" name="user_id">
 
-                            <option value="">Select Team Member *</option>
+                            <option value="">Select Team Member </option>
 
 
                                 @foreach($teacher as $teachers)
@@ -83,15 +83,64 @@
 
     @if($from && $to && $user_id)
 
-    @if($from == $to)
+        @if($from == $to)
 
-            <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> <b>{{$teacher->find($user_id)->name}}</b>'s Work Log of {{$from}}: </h6>
+                <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> <b>{{$teacher->find($user_id)->name}}</b>'s Work Log of {{$from}}: </h6>
+
+        @else
+                <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> <b>{{$teacher->find($user_id)->name}}</b>'s Work Log from {{$from}} to {{ $to }}: </h6>
+        @endif
+
+    @elseif($from && $to)
+
+        @if($from == $to)
+
+            <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> The Work Log of {{$from}}: </h6>
+
+        @else
+            
+            <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> The Work Log from {{$from}} to {{ $to }}: </h6>
+        
+        @endif
+
+
+    @elseif($user_id)
+
+
+        @if($user_id && $from && $to == null)
+
+          <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> <b>{{$teacher->find($user_id)->name}}</b>'s Work Log of {{$from}}: </h6>
+        
+
+
+        @elseif($user_id && $to && $from == null)
+
+          <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> <b>{{$teacher->find($user_id)->name}}</b>'s Work Log of {{$to}}: </h6>
+        
+
+        @else
+
+            <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> <b>{{$teacher->find($user_id)->name}}</b>'s Work Log: </h6>
+
+        @endif
+
+
+    @elseif($from && $to == null)
+
+        <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> The Work Log of {{$from}}: </h6>
+
+    @elseif($to && $from == null)
+
+        <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> The Work Log of {{$to}}: </h6>
+
 
     @else
-            <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> <b>{{$teacher->find($user_id)->name}}</b>'s Work Log from {{$from}} to {{ $to }}: </h6>
-    @endif
+
+
+        <h6 style=" padding-bottom: 25px; font-size: 17px"><i class="fa fa-calendar-check-o prefix"></i> Today's Work Log: </h6>
 
     @endif
+
     
         @foreach($data as $work)
 
@@ -173,7 +222,7 @@
 
                 <div class="input-field col s1">
 
-                    <a class="btn green tooltipped" href="{{ Asset($link.$work->id.'/edit') }}" style="padding:0px 10px" data-position="top" data-delay="50" data-tooltip="Edit This Entry"><i class="fa fa-edit fa-2x"></i></a>
+                    <a class="btn green tooltipped" href="{{ Asset($link.$work->id.'/view') }}" style="padding:0px 10px" data-position="top" data-delay="50" data-tooltip="View This Entry"><i class="fa fa-eye fa-2x"></i></a>
 
                      <form action="{{ Asset($link.$work->id.'/destroy_permanent') }}" method="POST" id="destroyPermanent_form_{{ $work->id }}" class="form-inline">
 

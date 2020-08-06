@@ -48,8 +48,8 @@ class WorkController extends Controller
     
     $admin_id = Auth::guard('admin')->user()->id;
 
-    $user_s = $request->input('user_id');
-    $from_s = [$request->get('from'), $request->get('to')];
+  //  $user_s = $request->input('user_id');
+   // $from_s = [$request->get('from'), $request->get('to')];
 
 
       /*$work = Work::where(function($query) use ($user_s) ($from_s){
@@ -58,7 +58,64 @@ class WorkController extends Controller
         $query->whereBetween('start_date', $from_s);
     })->get();*/
 
-    $work = Work::where('teacher_id', $request->get('user_id'))->whereBetween('start_date', [$request->get('from'), $request->get('to')])->get();
+      if($request->get('user_id') && $request->get('to') && $request->get('from')){
+
+            $work = Work::where('teacher_id', $request->get('user_id'))->whereBetween('start_date', [$request->get('from'), $request->get('to')])->get();
+        
+        }
+
+        elseif($request->get('to') && $request->get('from')){
+
+            $work = Work::whereBetween('start_date', [$request->get('from'), $request->get('to')])->get();
+
+        }
+
+
+        elseif($request->get('user_id')){
+
+
+            if($request->get('user_id') && $request->get('to') && $request->get('from') == null ){
+
+                $work = Work::where('teacher_id', $request->get('user_id'))->where('start_date', $request->get('to'))->get();
+
+            }
+
+
+            elseif($request->get('user_id') && $request->get('from') && $request->get('to') == null ){
+
+                $work = Work::where('teacher_id', $request->get('user_id'))->where('start_date', $request->get('from'))->get();
+
+
+            }
+
+            else{
+
+                $work = Work::where('teacher_id', $request->get('user_id'))->get();
+
+            }
+
+        }
+
+
+        elseif($request->get('to') && $request->get('from') == null )
+
+        {
+            $work = Work::where('start_date', $request->get('to'))->get();
+        }
+
+
+        elseif($request->get('from') && $request->get('to') == null )
+
+        {
+            $work = Work::where('start_date', $request->get('from'))->get();
+        }
+
+
+        else {
+
+            $work = Work::where('start_date', Carbon::today()->format('y-m-d'))->get();
+
+        }
 
 
         $data = [
@@ -81,7 +138,7 @@ class WorkController extends Controller
     |------------------------------------------------------------------
     |   Edit Work Page
     |------------------------------------------------------------------
-    */
+    
     public function edit($id)
     {
         $data = [
@@ -98,12 +155,34 @@ class WorkController extends Controller
         return View('admin.work.edit',$data);
 
     }
+*/
+
+    /*
+    |------------------------------------------------------------------
+    |   View Work Page
+    |------------------------------------------------------------------
+    */
+    public function view($id)
+    {
+        $data = [
+            'id' => $id,
+            'data' => Work::findOrFail($id),
+            'link' => env('admin').'/work-log/',
+            'teacher' => Teacher::get(),
+
+
+        ];
+
+        return View('admin.work.view',$data);
+
+    }
+
 
     /*
     |------------------------------------------------------------------
     |   Update Work Page
     |------------------------------------------------------------------
-    */
+   
     public function update(Request $request, $id)
     {
 
@@ -125,7 +204,7 @@ class WorkController extends Controller
         return Redirect(env('admin').'/work-log')->with('message','Work Updated Successfully.');
 
     }
-
+ */
 
     /*
     |------------------------------------------------------------------

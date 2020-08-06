@@ -23,11 +23,61 @@
         <div class="col s12 m12 l12">
 
 
-                   <form action="{{ Asset($link.'search') }}" method="GET" id="search_form" class="col s12">
+        <form action="{{ Asset($link.'search') }}" method="GET" id="search_form" class="col s12">
 
 
 
-                        <div class="input-field col s12 l5">
+            <div class="input-field col s12 l3">
+
+                <i class="fa fa-user prefix"></i>
+
+                <select style="padding-left: 40px" class="browser-default" name="teacher_id">
+
+                        <option value="">Select Team Member </option>
+
+
+                        @foreach($teacher as $teachers)
+
+                                <option value="{{ $teachers->id }}">
+
+                                {{ $teachers->name }}, ID: {{ $teachers->id }}
+
+                                </option>
+
+                        @endforeach
+
+
+                </select>
+
+                </div>
+
+
+                <div class="input-field col s12 l3">
+
+                     <i class="fa fa-user prefix"></i>
+
+                        <select style="padding-left: 40px" class="browser-default" name="student_id">
+
+                            <option value="">Select Student </option>
+
+
+                                @foreach($student as $students)
+
+                                        <option value="{{ $students->id }}">
+
+                                        {{ $students->name }}, ID: {{ $students->id }}
+
+                                        </option>
+
+                                @endforeach
+
+
+                         </select>
+
+                </div>
+
+
+                        <div class="input-field col s12 l2">
 
                                 <i class="fa fa-calendar prefix"></i>
 
@@ -38,7 +88,7 @@
                         </div>
 
 
-                        <div class="input-field col s12 l5">
+                        <div class="input-field col s12 l2">
 
                                 <i class="fa fa-calendar prefix"></i>
 
@@ -56,7 +106,7 @@
                             <button class="btn green waves-effect waves-light" type="submit" name="action">Search <i class="fa fa-search left"></i></button>
 
                         </div>
-                 </form>
+        </form>
 
         </div>
         </div>
@@ -72,18 +122,20 @@
 
                     <table class="striped" >
 
+                        <table class="striped" >
+
                         <thead>
 
                             <tr>
 
                                 <th> Name </th>
 
-                                <th style="text-align: center;">Task Name</th>
+                                <th style="text-align: center;"> Task Name </th>
 
                                 <th style="text-align: center;"> Submit Date </th>
 
                                 <th style="text-align: center;"> Deadline </th>
-
+                              
                                 <th style="text-align: center;"> Extended </th>
 
                                 <th style="text-align: center;"> Status </th>
@@ -96,39 +148,81 @@
 
                         <tbody>
 
-                            @foreach($data as $u_task)
+                        @foreach($data as $u_task)
 
-                            
-                        @if($u_task->remark)
-                            
 
-                            <tr style="color: red;">
+
+                    @if( $u_task->proof && $u_task->status != 'Denied')
+
+                                <tr class="card-panel">
+
+                                
+                            @else
+
+                            @if($u_task->deadline < today()->toDateString())
+                                    
+                                    @if($u_task->req_date)
+
+                                        @if($u_task->req_date < today()->toDateString())
+                                            <tr class="card-panel" style="color: red;">
+                                        @else
+                                            <tr class="card-panel">
+                                        @endif
+
+                                    @else
+
+                                    <tr class="card-panel" style="color: red;">
+
+                                    @endif
+
+                                @else
+
+                                <tr class="card-panel">
+
+                                @endif
+
+
+                         @endif
+
+
+                   <!-- User Name & Role  -->
+
+
+                        @if($u_task->student_id != null)
+
+
+                            <td width="10%" style="padding-left: 17px">{{ $student->find($u_task->student_id)->name }}</td>
+
 
                         @else
 
-                            <tr>
+                            <td width="10%" style="padding-left: 17px" >{{ $teacher->find($u_task->teacher_id)->name }}</td>
 
 
                         @endif
 
- 
 
-                           @if($u_task->student_id != null)
+                            <!-- Task Name -->
 
-                            <td width="10%">{{ $student->find($u_task->student_id)->name }}</td>
 
+                           @if($u_task->type == 'Task')
+
+                            <td width="15%" style="text-align: center;">{{ $task->find($u_task->task_id)->task_name }}</td>
+
+
+                            @elseif($u_task->type == 'G-Task')
+
+                            <td width="15%" style="text-align: center;" >{{ $gtask->find($u_task->gtask_id)->task_name }}</td>
 
                             @else
 
-                            <td width="10%" >{{ $teacher->find($u_task->teacher_id)->name }}</td>
+
+                            <td width="15%" style="text-align: center;" > N/A </td>
 
 
                             @endif
 
-
-
-                            <td width="15%" style="text-align: center;">{{$task->find($u_task->task_id)->task_name}}</td>
-
+                            
                             <td style="text-align: center;" width="15%">
 
 
@@ -145,7 +239,7 @@
 
                             </td>
 
-                            <td style="text-align: center;" width="10%">
+                            <td style="text-align: center;" width="15%">
 
                                 @if($u_task->deadline)
                                 
@@ -159,28 +253,29 @@
 
                             </td>
 
-                            <td style="text-align: center;" width="15%">{{$u_task->req_no}} time(s)</td>
+                            <td style="text-align: center;" width="10%">{{$u_task->req_no}} time(s)</td>
 
 
+
+                         <!-- Status -->
 
                              @if($u_task->status == 'Approved')
 
-                                <td width="15%" style="text-align: center; color: green"> Approved </td>
+                                <td width="10%" style="text-align: center; color: green; padding-left: 20px"> Approved </td>
 
 
                             @elseif($u_task->status == 'Denied')
                                   
-                                <td width="15%" style="text-align: center; color: red"> Denied </td>
+                                <td width="10%" style="text-align: center; color: red; padding-left: 20px"> Denied </td>
 
                             @else
 
-                                <td width="15%" style="text-align: center; color: orange"> Pending </td>
+                                <td width="10%" style="text-align: center; color: orange; padding-left: 20px"> Pending </td>
 
                             @endif
 
 
-
-                        <td width="20%" style="text-align: center;">
+                            <td width="25%" style="text-align: center;">
 
 
                                     <a href="{{ Asset($link.$u_task->id.'/download-proof') }}" class="btn blue tooltipped " data-position="top" data-delay="50" data-tooltip="Download Proof" style="padding:0px 10px"><i class="mdi-file-file-download"></i></a>

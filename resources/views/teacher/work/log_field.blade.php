@@ -60,8 +60,8 @@ $(function(){
     var maxDate = year + '-' + month + '-' + day;  
 
 
-    var yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 2);
+   var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
 
     var ymonth = yesterday.getMonth() + 1;
     var yday = yesterday.getDate();
@@ -73,7 +73,7 @@ $(function(){
         yday = '0' + yday.toString();
 
 
-    var minDate = yyear + '-' + ymonth + '-' + yday;  
+    var minDate = yyear + '-' + ymonth + '-' + yday;
 
 
     $('#start_date{{$uid}}').attr('max', maxDate);

@@ -224,6 +224,13 @@ Route::group(array('prefix' => env('admin'),'namespace' => 'Admin'), function(){
         Route::get('g-task-requests/{id}/download-proof','GlobalTaskController@downloadProof');
 
 
+                                // Select Fields//
+        // Add Select Field
+        Route::get('g-task/addSelectField','GlobalTaskController@addSelectField');
+        // Delete Select Field
+        Route::get('g-task/deleteSelectField/{id}','GlobalTaskController@deleteSelectField');
+
+
         /*
         |----------------------------------------------------------
         |   Manage Extend Requests
@@ -341,11 +348,15 @@ Route::group(array('prefix' => env('admin'),'namespace' => 'Admin'), function(){
         // Index - Search
         Route::get('work-log','WorkController@workSearch');
 
+
+        // View Work
+        Route::get('work-log/{id}/view','WorkController@view');
+
         // Edit Work
-        Route::get('work-log/{id}/edit','WorkController@edit');
+        //Route::get('work-log/{id}/edit','WorkController@edit');
 
        // Update Work Route
-       Route::post('work-log/{id}/update','WorkController@update');
+      // Route::post('work-log/{id}/update','WorkController@update');
 
        //Delete
        Route::delete('work-log/{id}/destroy_permanent','WorkController@destroyPermanent');
@@ -365,7 +376,7 @@ Route::group(array('prefix' => env('admin'),'namespace' => 'Admin'), function(){
         Route::patch('assign-requests/{id}/approve','TaskController@Assign_approve');
 
        //Assign Requests - Delete
-       Route::delete('assign-requests/{id}/remove','TaskController@Assign_Remove');
+       Route::patch('assign-requests/{id}/reject','TaskController@Assign_Remove');
 
     });
 });

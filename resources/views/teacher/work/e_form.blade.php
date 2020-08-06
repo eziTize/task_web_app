@@ -30,7 +30,7 @@
 
         <i class="fa fa-calendar prefix"></i>
 
-        {!! Form::date('start_date',null,['id' => 'start_date', 'required' => 'required', 'disabled' => 'disabled']) !!}
+        {!! Form::date('start_date',null,['id' => 'start_date', 'required' => 'required']) !!}
 
 
     </div>
@@ -73,5 +73,49 @@
 
 </div>
 
+@section('js')
 
+<!-- Script for date limitations -->
+
+<script>
+
+$(function(){
+    var dtToday = new Date();
+    var month = dtToday.getMonth() + 1;
+    var day = dtToday.getDate();
+    var year = dtToday.getFullYear();
+
+    if(month < 10)
+        month = '0' + month.toString();
+    if(day < 10)
+        day = '0' + day.toString();
+
+    var maxDate = year + '-' + month + '-' + day;  
+
+
+   var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    var ymonth = yesterday.getMonth() + 1;
+    var yday = yesterday.getDate();
+    var yyear = yesterday.getFullYear();
+
+    if(ymonth < 10)
+        ymonth = '0' + ymonth.toString();
+    if(yday < 10)
+        yday = '0' + yday.toString();
+
+
+    var minDate = yyear + '-' + ymonth + '-' + yday;
+
+
+    $('#start_date').attr('max', maxDate);
+    $('#start_date').attr('min', minDate);
+});
+
+</script>
+
+<!-- End Script -->
+
+@endsection
 

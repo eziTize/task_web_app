@@ -12,7 +12,7 @@
 
         @section('button')
 
-        <a href="{{ Asset($link) }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px">Display All </a>
+        <a href="{{ Asset($link) }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px">Back </a>
 
         @endsection
 

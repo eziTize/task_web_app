@@ -10,8 +10,13 @@ use App\Teacher;
 use App\UserTask;
 use App\GlobalTask;
 use App\Admin;
+use App\Branch;
+use App\Subject;
+use App\InvGtask;
+use App\TmbrBranch;
+use App\TmbrSubject;
+use Carbon\Carbon;
 use Response;
-
 use Redirect;
 
 class GlobalTaskController extends Controller
@@ -21,19 +26,51 @@ class GlobalTaskController extends Controller
     |   GlobalTask List Page
     |------------------------------------------------------------------
     */
-    public function index(){
+    public function index(Request $request){
 
 
-        $admin_id = Auth::guard('admin')->user()->id;
+
+
+    $admin_id = Auth::guard('admin')->user()->id;
+
+
+
+    if($request->get('to') && $request->get('from')){
+
+        $data = GlobalTask::where('admin_id', $admin_id)->whereBetween('start_date', [$request->get('from'), $request->get('to')])->where('is_deleted','0')->get();
+    }
+
+
+    elseif($request->get('to') && $request->get('from') == null){
+
+        $data = GlobalTask::where('admin_id', $admin_id)->where('start_date', $request->get('to'))->where('is_deleted','0')->get();
+
+    }
+
+
+    elseif($request->get('to') == null && $request->get('from')){
+
+        $data = GlobalTask::where('admin_id', $admin_id)->where('start_date', $request->get('from'))->where('is_deleted','0')->get();
+
+    }
+
+
+    else{
+
+        $data = GlobalTask::where('admin_id', $admin_id)->where('is_deleted','0')->whereDate('start_date', '>=' ,Carbon::today()->subDays(14)->toDateString())->get();
+
+    }
 
         
         $data = [
-            'data' => GlobalTask::where('admin_id', $admin_id)->where('is_deleted','0')->get(),
+            'data' => $data,
             'link' => env('admin').'/g-task/'
         ];
 
         return View('admin.g_task.index',$data);
-    }
+    
+}
+
 
 
     /*
@@ -46,6 +83,10 @@ class GlobalTaskController extends Controller
 
      $data = [
             'data' => new GlobalTask,
+            //'inv_gtask' => new InvGtask,
+            'branch' => Branch::where('is_deleted','0')->get(),
+            'subject' => Subject::where('is_deleted','0')->get(),
+
             'link' => env('admin').'/g-task/'
         ];
 
@@ -65,17 +106,19 @@ class GlobalTaskController extends Controller
 
         $admin_id = Auth::guard('admin')->user()->id;
 
-        $data =  new GlobalTask;
+        $teachers = Teacher::where('is_deleted','0')->get();
+
+
+        $data = new GlobalTask;
 
         if($data->validate($request->all(),"add")){
             return Redirect(env('admin').'/g-task/add')->withErrors($data->validate($request->all(),"add"))->withInput();
         }
+        
+
         $data->admin_id = $admin_id;
 
         $data->priority = $request->input('priority');
-
-
-        $data->task_for = $request->input('task_for');
 
         $data->task_name = $request->input('task_name');
 
@@ -85,11 +128,171 @@ class GlobalTaskController extends Controller
        
         $data->end_date = $request->input('end_date');
 
-
         $data->save();
-       return Redirect(env('admin').'/g-task')->with('message','New Task Created Successfully.');
+   
 
+
+
+        $input = $request->all();
+
+         if($request->branch_id){
+            foreach($request->branch_id as $key=>$value){
+
+
+                    if($value == 'All'){
+
+                      if( $value == 'All' && ($input['subject_id'][$key]) == 'All'){
+
+
+                        InvGtask::Create(array(
+                            'gtask_id' => $data->id,
+                            'branches' => 'all',
+                            'subjects' => 'all',
+                            ));
+
+                        foreach($teachers as $teacher){
+
+                        if(TmbrBranch::where('teacher_id', $teacher->id)->where('status', 'Y')->count() > 0){
+
+                        if(UserTask::where('teacher_id', $teacher->id)->where('gtask_id', $data->id)->count() == 0){
+                                
+                        $u_task = UserTask::Create(array(
+                                    'deadline' => $request->input('end_date'),
+                                    'teacher_id'  => $teacher->id,
+                                    'type' => 'G-Task',
+                                    'gtask_id' => $data->id,
+                                    
+                        ));
+
+                       }
+                    }
+                 
+                }
+            }
+
+
+                elseif($value == 'All' && ($input['subject_id'][$key]) != 'All'){
+
+
+                    InvGtask::Create(array(
+                        'gtask_id' => $data->id,
+                            'branches' => 'all',
+                            'subject_id' => $input['subject_id'][$key],
+                            ));
+
+
+                    foreach($teachers as $teacher){
+
+                    if(TmbrBranch::where('teacher_id', $teacher->id)->where('status', 'Y')->count() > 0 && TmbrSubject::where('teacher_id', $teacher->id)->where('subject_id', ($input['subject_id'][$key]) )->where('status', 'Y')->count() > 0){
+
+                        if(UserTask::where('teacher_id', $teacher->id)->where('gtask_id', $data->id)->count() == 0){
+
+                         $u_task = UserTask::Create(array(
+                                    'deadline' => $request->input('end_date'),
+                                    'teacher_id'  => $teacher->id,
+                                    'type' => 'G-Task',
+                                    'gtask_id' => $data->id,
+                        ));
+
+                       }
+
+                     }
+
+                   }
+                }
+
+            }
+
+
+            elseif($value != 'All' && ($input['subject_id'][$key]) != 'All'){
+
+
+                InvGtask::Create(array(
+                            'gtask_id' => $data->id,
+                            'branch_id' => $value,
+                            'subject_id' => $input['subject_id'][$key],
+                            ));
+
+                    foreach($teachers as $teacher){
+
+                    if(TmbrBranch::where('teacher_id', $teacher->id)->where('branch_id', $value)->where('status', 'Y')->count() > 0 && TmbrSubject::where('teacher_id', $teacher->id)->where('subject_id', ($input['subject_id'][$key]) )->where('status', 'Y')->count() > 0){
+
+
+                        if(UserTask::where('teacher_id', $teacher->id)->where('gtask_id', $data->id)->count() == 0){
+
+                                $u_task = UserTask::Create(array(
+                                                'deadline' => $request->input('end_date'),
+                                                'teacher_id'  => $teacher->id,
+                                                'type' => 'G-Task',
+                                                'gtask_id' => $data->id,
+                                              
+                                    ));
+
+                            }
+                    }
+                  }
+
+                }
+
+                elseif($value != 'All' && ($input['subject_id'][$key]) == 'All'){
+
+
+                    InvGtask::Create(array(
+                        'gtask_id' => $data->id,
+                            'branch_id' => $value,
+                            'subjects' => 'all',
+                            ));
+
+                    foreach($teachers as $teacher){
+
+                if(TmbrBranch::where('teacher_id', $teacher->id)->where('branch_id', $value)->where('status', 'Y')->count() > 0 && TmbrSubject::where('teacher_id', $teacher->id)->where('status', 'Y')->count() > 0){
+
+                    if(UserTask::where('teacher_id', $teacher->id)->where('gtask_id', $data->id)->count() == 0){
+
+                                        $u_task = UserTask::Create(array(
+                                                                'deadline' => $request->input('end_date'),
+                                                                'teacher_id'  => $teacher->id,
+                                                                'type' => 'G-Task',
+                                                                'gtask_id' => $data->id,
+                                                            
+                                                    ));
+                                        }
+                            }
+
+                    }
+                }
+
+        }
     }
+
+       return Redirect(env('admin').'/g-task')->with('message','Global Task Created Successfully.');
+
+}
+
+
+    /*
+    |------------------------------------------------------------------
+    |   Select Field Add
+    |------------------------------------------------------------------
+    */
+    public function addSelectField(){
+
+        return View('admin.g_task.select_field');
+    }
+    
+    /*
+    |------------------------------------------------------------------
+    |   Select Field Delete
+    |------------------------------------------------------------------
+    */
+    public function deleteSelectField($id){
+
+        $inv_gtask = InvGtask::findOrFail($id);
+        $inv_gtask->delete();
+
+        return Redirect::back()->with('message','Removed Successfully.');
+    }
+
 
 
     /*
@@ -113,6 +316,7 @@ class GlobalTaskController extends Controller
     |------------------------------------------------------------------
     */
     public function trash(){
+        
         $data = [
             'data' => GlobalTask::where('is_deleted','1')->get(),           
             'link' => env('admin').'/g-task/',
@@ -130,6 +334,7 @@ class GlobalTaskController extends Controller
     |------------------------------------------------------------------
     */
     public function restore($id){
+        
         $data = GlobalTask::findOrFail($id);
         $data->is_deleted = false;
         $data->save();
@@ -159,10 +364,12 @@ class GlobalTaskController extends Controller
     public function edit($id)
     {
 
-
         $data = [
             'id' => $id,
             'data' => GlobalTask::findOrFail($id),
+            'inv_gtasks' => InvGtask::where('gtask_id',$id)->get(),
+             'branch' => Branch::where('is_deleted','0')->get(),
+            'subject' => Subject::where('is_deleted','0')->get(),
             'link' => env('admin').'/g-task/'
         ];
 
@@ -183,36 +390,154 @@ class GlobalTaskController extends Controller
 
         $data =  GlobalTask::findOrFail($id);
 
+        $teachers = Teacher::where('is_deleted','0')->get();
+
+
         if($data->validate($request->all(),"edit")){
             return Redirect(env('admin').'/g-task/'.$id.'/edit')->withErrors($data->validate($request->all(),"edit"))->withInput();
         }
 
         $data->admin_id = $admin_id;
 
-        $data->task_for = $request->input('task_for');
-
         $data->task_name = $request->input('task_name');
-
         $data->priority = $request->input('priority');
-
-
         $data->task_desc = $request->input('task_desc');
-      
-    
 
         $data->save();
 
 
-        //$data->complete_rq = $request->input('complete_rq');
+        $input = $request->all();
+
+         if($request->branch_id){
+            foreach($request->branch_id as $key=>$value){
 
 
-        //$notification = new Notification;
+                    if($value == 'All'){
 
-        //$notification->teacher_id = $request->input('asg_teacher_id');
+                      if( $value == 'All' && ($input['subject_id'][$key]) == 'All'){
 
-        //$notification->message = 'Your Task has been updated recently';
 
-        //$notification->save();
+                        InvGtask::Create(array(
+                            'gtask_id' => $data->id,
+                            'branches' => 'all',
+                            'subjects' => 'all',
+                            ));
+
+                        foreach($teachers as $teacher){
+
+                        if(TmbrBranch::where('teacher_id', $teacher->id)->where('status', 'Y')->count() > 0){
+
+                        if(UserTask::where('teacher_id', $teacher->id)->where('gtask_id', $data->id)->count() == 0){
+                                
+                        $u_task = UserTask::Create(array(
+                                    'deadline' => $data->deadline,
+                                    'teacher_id'  => $teacher->id,
+                                    'type' => 'G-Task',
+                                    'gtask_id' => $data->id,
+                                    
+                        ));
+
+                       }
+                    }
+                 
+                }
+            }
+
+
+                elseif($value == 'All' && ($input['subject_id'][$key]) != 'All'){
+
+
+                    InvGtask::Create(array(
+                        'gtask_id' => $data->id,
+                            'branches' => 'all',
+                            'subject_id' => $input['subject_id'][$key],
+                            ));
+
+
+                    foreach($teachers as $teacher){
+
+                    if(TmbrBranch::where('teacher_id', $teacher->id)->where('status', 'Y')->count() > 0 && TmbrSubject::where('teacher_id', $teacher->id)->where('subject_id', ($input['subject_id'][$key]) )->where('status', 'Y')->count() > 0){
+
+                        if(UserTask::where('teacher_id', $teacher->id)->where('gtask_id', $data->id)->count() == 0){
+
+                         $u_task = UserTask::Create(array(
+                                    'deadline' => $data->deadline,
+                                    'teacher_id'  => $teacher->id,
+                                    'type' => 'G-Task',
+                                    'gtask_id' => $data->id,
+                        ));
+
+                       }
+
+                     }
+
+                   }
+                }
+
+            }
+
+
+            elseif($value != 'All' && ($input['subject_id'][$key]) != 'All'){
+
+
+                InvGtask::Create(array(
+                            'gtask_id' => $data->id,
+                            'branch_id' => $value,
+                            'subject_id' => $input['subject_id'][$key],
+                            ));
+
+                    foreach($teachers as $teacher){
+
+                    if(TmbrBranch::where('teacher_id', $teacher->id)->where('branch_id', $value)->where('status', 'Y')->count() > 0 && TmbrSubject::where('teacher_id', $teacher->id)->where('subject_id', ($input['subject_id'][$key]) )->where('status', 'Y')->count() > 0){
+
+
+                        if(UserTask::where('teacher_id', $teacher->id)->where('gtask_id', $data->id)->count() == 0){
+
+                                $u_task = UserTask::Create(array(
+                                                'deadline' => $data->deadline,
+                                                'teacher_id'  => $teacher->id,
+                                                'type' => 'G-Task',
+                                                'gtask_id' => $data->id,
+                                              
+                                    ));
+
+                            }
+                    }
+                  }
+
+                }
+
+                elseif($value != 'All' && ($input['subject_id'][$key]) == 'All'){
+
+
+                    InvGtask::Create(array(
+                        'gtask_id' => $data->id,
+                            'branch_id' => $value,
+                            'subjects' => 'all',
+                            ));
+
+                    foreach($teachers as $teacher){
+
+                if(TmbrBranch::where('teacher_id', $teacher->id)->where('branch_id', $value)->where('status', 'Y')->count() > 0 && TmbrSubject::where('teacher_id', $teacher->id)->where('status', 'Y')->count() > 0){
+
+                    if(UserTask::where('teacher_id', $teacher->id)->where('gtask_id', $data->id)->count() == 0){
+
+                                        $u_task = UserTask::Create(array(
+                                                                'deadline' => $data->deadline,
+                                                                'teacher_id'  => $teacher->id,
+                                                                'type' => 'G-Task',
+                                                                'gtask_id' => $data->id,
+                                                            
+                                                    ));
+                                        }
+                            }
+
+                    }
+                }
+
+        }
+    }
+    
 
 
 
@@ -252,30 +577,24 @@ class GlobalTaskController extends Controller
     {
 
 
-
         $data =  GlobalTask::findOrFail($id);
+
+        $u_tasks = UserTask::where('gtask_id', $id)->get();
 
          if($data->validate($request->all(),"extend")){
             return Redirect(env('admin').'/g-task/'.$id.'/extend')->withErrors($data->validate($request->all(),"extend"))->withInput();
         }
        
         $data->end_date = $request->input('end_date');
-
         $data->save();
 
 
-        //$data->complete_rq = $request->input('complete_rq');
+         foreach($u_tasks as $u_task){
 
+            $u_task->deadline = $request->input('end_date');
+            $u_task->save();
 
-        //$notification = new Notification;
-
-        //$notification->student_id = $request->input('asg_student_id');
-
-        //$notification->message = 'Your Task has been extended recently';
-
-        //$notification->save();
-
-
+        }
 
        return Redirect(env('admin').'/g-task')->with('message','End Date Updated Successfully.');
 
@@ -288,7 +607,7 @@ class GlobalTaskController extends Controller
     |------------------------------------------------------------------
     |   Approve GlobalTask List
     |------------------------------------------------------------------
-    */
+   
 
     public function ApproveTaskIndex()
     {
@@ -312,12 +631,12 @@ class GlobalTaskController extends Controller
 
     }
 
-
+ */
     /*
     |------------------------------------------------------------------
     |   Index - Search
     |------------------------------------------------------------------
-    */
+    
 
     public function ApproveSearch(Request $request){
 
@@ -341,136 +660,12 @@ class GlobalTaskController extends Controller
     }
 
 
-
-    /*
-    |------------------------------------------------------------------
-    |   Approve GlobalTasks
-    |------------------------------------------------------------------
-    */
-
-    public function ApproveTasks(Request $request, $id)
-    {
-
-
-
-        $data =  UserTask::findOrFail($id);
-
-       
-        $data->status = 'Approved';
-        $data->grade = $request->input('grade');
-
-
-        $data->save();
-
-
-       return Redirect(env('admin').'/g-task-requests')->with('message','Task Approved Successfully.');
-
-
-    }
-
-
-    /*
-    |------------------------------------------------------------------
-    |   Approve GlobalTasks Page
-    |------------------------------------------------------------------
-    */
-
-    public function ApproveTasksPage($id)
-    {
-
-
-
-        $u_task = UserTask::findOrFail($id);
-        $g_task =  GlobalTask::get();
-
-        $data = [
-            'data' => $u_task,
-            'teacher' => Teacher::get(),
-            'student' => Student::get(),
-            'g_task' => $g_task,
-            'link' => env('admin').'/g-task-requests/'
-        ];
-
-        return View('admin.g_task.approve',$data);
-
-
-    }
-
-
-    /*
-    |------------------------------------------------------------------
-    |   Deny Approve Request
-    |------------------------------------------------------------------
-    */
-
-    public function DenyTask(Request $request, $id)
-    {
-
-
-
-        $data =  UserTask::findOrFail($id);
-
-       
-        $data->status = 'Denied';
-
-        $data->save();
-
-
-       return Redirect(env('admin').'/g-task-requests')->with('message','Task Denied Successfully.');
-
-
-    }
-
-
-    /*
-    |------------------------------------------------------------------
-    |   Download Proof
-    |------------------------------------------------------------------
-    */
-    public function downloadProof($id)
-    {
-
-            $u_task = UserTask::findOrFail($id);
-
-            $file_path = 'upload/task_proof/'. $u_task->proof;
-
-            if($u_task->proof == null) {
-
-                return back()->with('error','No File Found.');
-
-
-            }
-            return Response::download($file_path);
-
-    }
-
-
-     /*
-    |------------------------------------------------------------------
-    |   Extend Requests - Page
-    |------------------------------------------------------------------
-    */
-    public function ExtendRequests(){
-
-        
-        $data = [
-
-            'data' => UserTask::where('has_request', 1)->where('type', 'G-Task')->get(),
-            'teacher' => Teacher::get(),
-            //'student'=> Student::get(),
-            'link' => env('admin').'/g-extend-requests/'
-        ];
-
-        return View('admin.g_task.er_index',$data);
-    }
-
-
-
+*/
     /*
     |------------------------------------------------------------------
     |   Approve Extend Request
     |------------------------------------------------------------------
-    */
+    
     public function ExtendR($id){
 
         
@@ -483,12 +678,12 @@ class GlobalTaskController extends Controller
 
     }
 
-
+*/
     /*
     |------------------------------------------------------------------
     |   Remove Extend Request
     |------------------------------------------------------------------
-    */
+   
     public function erRemove($id){
 
         
@@ -501,5 +696,5 @@ class GlobalTaskController extends Controller
 
     }
 
-
+ */
 }

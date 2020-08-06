@@ -282,7 +282,7 @@ class TaskController extends Controller
        
         $data->end_date = $request->input('end_date');
 
-        $data->approved = 'N';
+        $data->approved = 'P';
 
 
         $data->save();

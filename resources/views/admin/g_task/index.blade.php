@@ -12,11 +12,60 @@
 
         @section('button')
 
-       <a href="{{ Asset($link.'add') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px">Add New</a>
 
-        <a href="{{ Asset($link.'trash') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px;margin-right:5px;">View Trash</a>
+        <a href="{{ Asset($link.'trash') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px;">View Trash</a>
+
+       <a href="{{ Asset($link.'add') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px; margin-right:5px;">Assign New</a>
+
+       
 
         @endsection
+
+    <div class="row">
+
+        <div class="col s12 m12 l12">
+
+
+                   <form action="{{ Asset($link) }}" method="GET" id="search_form" class="col s12">
+
+
+
+                        <div class="input-field col s12 l5">
+
+                                <i class="fa fa-calendar prefix"></i>
+
+                                {!! Form::date('from', null,['id' => 'from','required' => 'required', 'class' => 'datepicker' ]) !!}
+
+                                <label for="from">From </label>
+
+                        </div>
+
+
+                        <div class="input-field col s12 l5">
+
+                                <i class="fa fa-calendar prefix"></i>
+
+                                {!! Form::date('to', null,['id' => 'to','required' => 'required', 'class' => 'datepicker' ]) !!}
+
+                                <label for="to">To </label>
+
+
+                        </div>
+
+            
+
+                        <div class="input-field col s2 l2">
+
+                            <button class="btn green waves-effect waves-light" type="submit" name="action">Search <i class="fa fa-search left"></i></button>
+
+                        </div>
+
+                </form>
+        </div>
+        </div>
+
+        <br/>
+
 
 
         <div id="striped-table">
@@ -31,13 +80,11 @@
 
                             <tr>
 
-                                <th>Task For</th>
-
-                                <th style="text-align: center;">Task Name</th>
+                                <th>Task Name</th>
 
                                 <th style="text-align: center;">Start</th>
 
-                                <th style="text-align: center;">End</th>
+                                <th style="text-align: center;">Deadline</th>
 
                                 <th style="text-align: center;">Priority</th>
 
@@ -51,41 +98,28 @@
 
                             @foreach($data as $task)
 
-                            <tr>
-
-                                @if($task->task_for == 'Students')
-
-                                <td width="15%">All Students</td>
-
-                                @elseif($task->task_for == 'Teachers')
-
-                                <td width="15%">All Teachers</td>
-
-                                @else
-
-                                <td width="15%">N/A</td>
-
-                                @endif
-
-                                <td width="20%" style="text-align: center;">{{$task->task_name}}</td>
-
-                                <td style="text-align: center;" width="15%">{{$task->start_date}}</td>
+                            <tr class="card-panel">
 
 
-                                <td width="15%" style="text-align: center;">{{$task->end_date}}</td>
+                                <td width="20%" style="padding-left: 17px;">{{$task->task_name}}</td>
+
+                                <td style="text-align: center;" width="20%">{{$task->start_date}}</td>
+
+
+                                <td width="20%" style="text-align: center;">{{$task->end_date}}</td>
 
 
                                 @if($task->priority == 'High')
 
-                                <td width="15%" style="color: red; text-align: center;"> High </td>
+                                <td width="20%" style="color: red; text-align: center;"> High </td>
 
                                 @elseif($task->priority == 'Average' )
 
-                                <td width="15%" style="color: green; text-align: center;"> Average  </td>
+                                <td width="20%" style="color: green; text-align: center;"> Average  </td>
 
                                 @else
 
-                                <td width="15%"  style="color: orange; text-align: center;"> Low </td>
+                                <td width="20%"  style="color: orange; text-align: center;"> Low </td>
 
                                 @endif
 

@@ -1,45 +1,29 @@
-<div class="row">
+<div class="col s12 m12 l12">
 
-	<div class="input-field col s12 112">
+		<div class="row">
 
+			@include('admin.g_task.select_field')
 
-
-		<i class="fa fa-users prefix"></i>
-
-
-		<select style="padding-left: 40px" class="browser-default" name="task_for" required>
+			<span id="select_field"></span>
 
 
-			@if($data->task_for)
+			<br>
 
-			<option value="{{$data->task_for}}"> All {{$data->task_for}} </option>
+				<div style="margin-left:10px">
 
-			@else
+					<button type="button" class="btn green tooltipped" onClick="addSelectField();" data-position="right" data-delay="50" data-tooltip="Add More"><i class="fa fa-plus"></i></button>
 
-					<option value="Students">
+				</div>
 
-					All Students
-
-					</option>
+			<br>
 
 
-					<option value="Teachers">
-
-					All Teachers
-
-					</option>
-
-			@endif
-
-
-
-		</select>
-
-	</div>
+		</div>
 
 </div>
 
-<br>
+	
+
 
 <div class="row">
 
@@ -117,3 +101,60 @@
 	</div>
 
 </div>
+
+
+@section('js')
+
+<script>
+
+	function addSelectField(){
+
+		$("<div>").load("{{ Asset(env('admin').'/g-task/addSelectField') }}", function(){
+
+			$("#select_field").append($(this).html());
+
+		});
+
+	}
+
+
+
+	function Remove(id){
+
+		$(id).remove();
+
+	}
+
+
+
+	function Prev_Remove(id){
+
+		swal({
+
+        	title: "Are you sure?",
+
+        	text: "Your data will be deleted!",
+
+        	type: "warning",
+
+        	showCancelButton: true,
+
+        	confirmButtonColor: '#DD6B55',
+
+        	confirmButtonText: "Yes, delete it!",
+
+        	closeOnConfirm: false
+
+        }, function(){
+
+        	swal("Deleted!", "Your data has been deleted!", "success");
+
+			window.location.href = "{{ Asset(env('admin').'/g-task/deleteSelectField') }}/"+id;
+
+        });
+
+	}
+
+</script>
+
+@endsection

@@ -26,28 +26,80 @@
 
 
       {!! Form::model($data, ['method' => 'GET','url' => [env('admin').'/reports-all/search'],'files' => true,'autocomplete' => 'off'],['class' => 'col s12']) !!}
-                <div class="input-field col s12 l5">
+                
+
+            <div class="input-field col s12 l3">
+
+                <i class="fa fa-user prefix"></i>
+
+                <select style="padding-left: 40px" class="browser-default" name="teacher_id">
+
+                        <option value="">Select Team Member </option>
+
+
+                        @foreach($teacher as $teachers)
+
+                                <option value="{{ $teachers->id }}">
+
+                                {{ $teachers->name }}, ID: {{ $teachers->id }}
+
+                                </option>
+
+                        @endforeach
+
+
+                </select>
+
+                </div>
+
+
+                <div class="input-field col s12 l3">
+
+                     <i class="fa fa-user prefix"></i>
+
+                        <select style="padding-left: 40px" class="browser-default" name="student_id">
+
+                            <option value="">Select Student </option>
+
+
+                                @foreach($student as $students)
+
+                                        <option value="{{ $students->id }}">
+
+                                        {{ $students->name }}, ID: {{ $students->id }}
+
+                                        </option>
+
+                                @endforeach
+
+
+                         </select>
+
+                </div>
+
+
+                <div class="input-field col s12 l2">
 
                         <i class="fa fa-calendar prefix"></i>
 
                         {!! Form::date('from', null,['id' => 'from','required' => 'required', 'class' => 'datepicker' ]) !!}
 
-                        <label for="from">From </label>
+                        <label for="from">From Deadline</label>
 
 
                 </div>
 
 
-                        <div class="input-field col s12 l5">
+                <div class="input-field col s12 l2">
 
-                            <i class="fa fa-calendar prefix"></i>
+                        <i class="fa fa-calendar prefix"></i>
 
-                            {!! Form::date('to', null,['id' => 'to','required' => 'required', 'class' => 'datepicker' ]) !!}
+                        {!! Form::date('to', null,['id' => 'to','required' => 'required', 'class' => 'datepicker' ]) !!}
 
-                            <label for="to">To </label>
+                        <label for="to">To Deadline</label>
 
 
-                        </div>
+                </div>
 
     
 

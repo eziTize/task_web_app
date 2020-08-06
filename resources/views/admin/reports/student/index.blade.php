@@ -5,6 +5,51 @@
 <div class="container">
     <div class="section">
 
+        <div class="row" style=" padding-bottom: 25px">
+
+        <div class="col s12 m12 l12">
+
+
+           <form action="{{ Asset($link) }}" method="GET" id="search_form" class="col s12">
+
+
+
+                    <div class="input-field col s12 l10">
+
+                     <i class="fa fa-user prefix"></i>
+
+                        <select style="padding-left: 40px" class="browser-default" name="user_id" required>
+
+                            <option value="">Select Student </option>
+
+
+                                @foreach($students as $student)
+
+                                        <option value="{{ $student->id }}">
+
+                                        {{ $student->name }}, ID: {{ $student->id }}
+
+                                        </option>
+
+                                @endforeach
+
+
+                            </select>
+
+                        </div>
+
+            
+
+                    <div class="input-field col s2 l2">
+
+                        <button class="btn green waves-effect waves-light" type="submit" name="action">Search <i class="fa fa-search left"></i></button>
+
+                    </div>
+            </form>
+
+        </div>
+        </div>
+
         <div id="striped-table">
             <div class="row">
                 <div class="col s12 m12 l12">

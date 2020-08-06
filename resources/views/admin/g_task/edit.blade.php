@@ -5,7 +5,7 @@
 <div class="container">
     <div class="section">
         @section('button')
-        <a href="{{ Asset($link) }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px">List</a>
+        <a href="{{ Asset($link) }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px">Back</a>
         @endsection
         
         <div class="row">

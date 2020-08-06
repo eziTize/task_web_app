@@ -14,8 +14,8 @@
 
         <a href="{{ Asset($link.'search') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px;">Search</a>
 
-       <a href="{{ Asset($link.'add') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px;margin-right:5px;">Add New</a>
-       
+        <a href="{{ Asset($link.'add') }}" class="btn cyan waves-effect waves-light right" style="margin-top:25px; margin-right:5px;">Assign New</a>    
+           
         @endsection
 
 
@@ -86,8 +86,11 @@
 
                                 @elseif($task->approved == 'N' )
 
-                                <td width="10%" style="color: orange; text-align: center;"> Pending </td>
+                                <td width="10%" style="color: red; text-align: center;"> Rejected </td>
 
+                                @elseif($task->approved == 'P' )
+
+                                <td width="10%" style="color: orange; text-align: center;"> Pending </td>
 
                                 @endif
 

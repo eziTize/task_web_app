@@ -135,13 +135,14 @@
                 </div>
 
 
+ @if($work->start_date == $today)
 
                 <div class="input-field col s1">
 
                     <a class="btn green tooltipped" href="{{ Asset($link.$work->id.'/edit') }}" style="padding:0px 10px" data-position="top" data-delay="50" data-tooltip="Edit This Entry"><i class="fa fa-edit fa-2x"></i></a>
 
                 </div>
-
+@endif
 
             </div>
 

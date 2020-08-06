@@ -32,6 +32,8 @@
 
                                 <th style="text-align: center;"> Deadline </th>
 
+                                <th style="text-align: center;"> Status </th>
+
                                 <th style="text-align: center;"> Options </th>
 
 
@@ -49,20 +51,34 @@
 
                                
 
-                            <td width="15%" style="padding-left: 17px">{{ $teacher->find($task->teacher_id)->name }}</td>
+                            <td width="12%" style="padding-left: 17px">{{ $teacher->find($task->teacher_id)->name }}</td>
 
-                            <td width="15%" style="text-align: center;">{{ $teacher->find($task->asg_teacher_id)->name }}</td>
-
-
+                            <td width="12%" style="text-align: center;">{{ $teacher->find($task->asg_teacher_id)->name }}</td>
 
 
-                                <td style="text-align: center;" width="20%"> {{$task->task_name}} </td>
+
+
+                                <td style="text-align: center;" width="16%"> {{$task->task_name}} </td>
 
 
                                 <td width="15%" style="text-align: center;">{{$task->start_date}}</td>
 
                                 <td width="15%" style="text-align: center;">{{$task->end_date}}</td>
 
+
+                                @if($task->approved == 'Y')
+
+                                <td width="10%" style="color: green; text-align: center;"> Assigned </td>
+
+                                @elseif($task->approved == 'N' )
+
+                                <td width="10%" style="color: red; text-align: center;"> Rejected </td>
+
+                                @elseif($task->approved == 'P' )
+
+                                <td width="10%" style="color: orange; text-align: center;"> Pending </td>
+
+                                @endif
 
 
                                 <td width="20%" style="text-align: center;">
@@ -79,15 +95,18 @@
                                     </form>
 
 
-                                    <form action="{{ Asset($link.$task->id.'/remove') }}" method="POST" id="remove_form_{{ $task->id }}" class="form-inline">
+
+                                    @if($task->approved == 'P')
+                                    <form action="{{ Asset($link.$task->id.'/reject') }}" method="POST" id="remove_form_{{ $task->id }}" class="form-inline">
 
                                         @csrf
 
-                                        @method('DELETE')
+                                        @method('PATCH')
 
-                                        <button type="button" class="btn red tooltipped " data-position="top" data-delay="50" data-tooltip="Remove This Request" style="padding:0px 10px" onclick="confirmAlert('remove',this)"><i class="mdi-content-clear"></i></button>
+                                        <button type="button" class="btn red tooltipped " data-position="top" data-delay="50" data-tooltip="Reject This Request" style="padding:0px 10px" onclick="confirmAlert('reject',this)"><i class="mdi-content-clear"></i></button>
 
                                     </form>
+                                    @endif
 
                                 </td>
 

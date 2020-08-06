@@ -9,6 +9,7 @@ use Validator;
 class UserTask extends Model
 {
 	protected $table = "user_tasks";
+	protected $fillable = ['deadline', 'student_id', 'teacher_id', 'type', 'task_id', 'gtask_id'];
 
 
 	/*
@@ -22,7 +23,7 @@ class UserTask extends Model
     );
 
 
-      /*
+    /*
 	|----------------------------------------------------------------
 	|	Validate data for add & extend & update records
 	|----------------------------------------------------------------

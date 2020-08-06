@@ -27,7 +27,7 @@ class WorkController extends Controller
         $data = [
             'data' => Work::where('teacher_id', $teacher_id)->whereDate('start_date', '>=' ,Carbon::today()->toDateString())->get(),
             'link' => env('teacher').'/work-log/',
-            'today' => Carbon::today()->format('d-m-y'),
+            'today' => Carbon::today()->toDateString(),
 //            'yesterday' => Carbon::today()->subDays(1)->format('d-m-y'),
             'past' => Carbon::today()->subDays(2)->format('d-m-y'),
         ];
@@ -211,6 +211,7 @@ class WorkController extends Controller
             'link' => env('teacher').'/work-log/',
             'from' => $request->get('from'),
             'to' => $request->get('to'),
+            'today' => Carbon::today()->toDateString(),
         ];
 
 
